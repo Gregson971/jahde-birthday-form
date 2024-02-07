@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<form action="/" method="post">
+    {% if error_message %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4" role="alert">
+        <strong class="font-bold">Attention !</strong>
+        <span class="block sm:inline">{{error_message}}</span>
+    </div>
+    {% endif %}
+    <div class="mb-4">
+        <label for="is_present" class="block text-sm font-bold mb-2">Je serai présent :</label>
+        <select name="is_present" id="is_present" class="w-full p-2 border border-gray-300 rounded">
+            <option value="yes">Oui</option>
+            <option value="no">Non</option>
+        </select>
+    </div>
+    <div class="mb-4">
+        <label for="firstname" class="block text-sm font-bold mb-2">Prénom</label>
+        <input type="text" name="firstname" id="firstname" required class="w-full p-2 border border-gray-300 rounded">
+    </div>
+    <div class="mb-4">
+        <label for="name" class="block text-sm font-bold mb-2">Nom</label>
+        <input type="text" name="name" id="name" required class="w-full p-2 border border-gray-300 rounded">
+    </div>
+    <div class="mb-4">
+        <label for="number_guests" class="block text-sm font-bold mb-2">Nombre de personnes</label>
+        <input type="number" name="number_guests" id="number_guests" required
+            class="w-full p-2 border border-gray-300 rounded">
+    </div>
+    <div class="mb-4">
+        <label for="message" class="block text-sm font-bold mb-2">Message</label>
+        <textarea name="message" id="message" class="w-full p-2 border border-gray-300 rounded"></textarea>
+    </div>
+    <button type="submit" class="bg-purple-600 text-white p-2 rounded">Confirmer</button>
+</form>
+{% endblock %}
