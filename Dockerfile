@@ -1,7 +1,7 @@
 # Description: Dockerfile for the Flask app
 
 # Use the official image as a parent image
-FROM python:python-3.12.2
+FROM python:3.11.0a1-alpine3.14
 
 # Set the working directory in the container
 COPY ./requirements.txt /app/requirements.txt

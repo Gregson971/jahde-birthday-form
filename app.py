@@ -1,5 +1,27 @@
 from flask import Flask, render_template, request
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from dotenv import dotenv_values
 
+from models import Base, Guest
+
+
+config = dotenv_values(".env")
+
+db_user = config["DB_USER"]
+db_password = config["DB_PASSWORD"]
+db_host = config["DB_HOST"]
+db_port = config["DB_PORT"]
+db_name = config["DB_NAME"]
+
+db_url = f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+
+
+# Create a connection to the database
+engine = create_engine(db_url)
+
+
+# Create a new Flask app
 app = Flask(__name__)
 
 
@@ -29,29 +51,29 @@ def index():
                 message = "No message"
 
             # Ajoutez les données du formulaire dans la base de données
-            # sqlite
-            import sqlite3
 
-            conn = sqlite3.connect("guests.db")
+            Base.metadata.create_all(engine)
 
-            conn.row_factory = sqlite3.Row
+            Session = sessionmaker(bind=engine)
+            session = Session()
 
-            cursor = conn.cursor()
+            guest = Guest(
+                name=name,
+                firstname=firstname,
+                number_guests=number_guests,
+                is_present=is_present,
+                message=message,
+            )
 
-            cursor.execute("SELECT name, firstname FROM guests WHERE name = ? AND firstname = ?", (name, firstname))
-            row = cursor.fetchone()
+            query = session.query(Guest).filter_by(name=name, firstname=firstname).first()
 
-            if row:
+            if query:
                 error_message = "Vous avez déjà soumis une réponse."
                 return render_template("index.html", error_message=error_message)
             else:
-                cursor.execute(
-                    "INSERT INTO guests (name, firstname, number_guests, is_present, message) VALUES (?, ?, ?, ?, ?)",
-                    (name, firstname, number_guests, is_present, message),
-                )
-
-            conn.commit()
-            conn.close()
+                session.add(guest)
+                session.commit()
+                session.close()
 
             return render_template(
                 "confirmation.html",
@@ -68,4 +90,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8000, host='0.0.0.0')
