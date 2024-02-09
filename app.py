@@ -1,3 +1,5 @@
+import os
+from re import I
 from flask import Flask, render_template, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -8,18 +10,18 @@ from models import Base, Guest
 
 config = dotenv_values(".env")
 
-db_user = config["DB_USER"]
-db_password = config["DB_PASSWORD"]
-db_host = config["DB_HOST"]
-db_port = config["DB_PORT"]
-db_name = config["DB_NAME"]
+env = os.environ.get("ENV", "development")
 
-db_url = f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+if env == "production":
+    db_url = os.environ.get("DATABASE_URL")
+else:
+    db_user = config["DB_USER"]
+    db_password = config["DB_PASSWORD"]
+    db_host = config["DB_HOST"]
+    db_port = config["DB_PORT"]
+    db_name = config["DB_NAME"]
 
-
-# Create a connection to the database
-engine = create_engine(db_url)
-
+    db_url = f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 
 # Create a new Flask app
 app = Flask(__name__)
@@ -50,7 +52,9 @@ def index():
             if message == "":
                 message = "No message"
 
-            # Ajoutez les données du formulaire dans la base de données
+            # Add the data to the database
+            # Create a connection to the database
+            engine = create_engine(db_url)
 
             Base.metadata.create_all(engine)
 
@@ -90,4 +94,5 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8000, host='0.0.0.0')
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
