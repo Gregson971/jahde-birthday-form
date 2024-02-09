@@ -1,30 +1,36 @@
 import os
-from re import I
 from flask import Flask, render_template, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from flask_sqlalchemy import SQLAlchemy
 from dotenv import dotenv_values
 
 from models import Base, Guest
 
 
-config = dotenv_values(".env")
-
-env = os.environ.get("ENV", "development")
+env = os.environ.get("ENV")
 
 if env == "production":
-    db_url = os.environ.get("DATABASE_URL")
+    db_user = os.environ.get("DB_USER")
+    db_password = os.environ.get("DB_PASSWORD")
+    db_host = os.environ.get("DB_HOST")
+    db_port = os.environ.get("DB_PORT")
+    db_name = os.environ.get("DB_NAME")
 else:
+    config = dotenv_values(".env")
     db_user = config["DB_USER"]
     db_password = config["DB_PASSWORD"]
     db_host = config["DB_HOST"]
     db_port = config["DB_PORT"]
     db_name = config["DB_NAME"]
 
-    db_url = f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+db_url = f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 
 # Create a new Flask app
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+db = SQLAlchemy(app)
 
 
 @app.route("/", methods=["GET", "POST"])
