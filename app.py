@@ -28,6 +28,18 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 db = SQLAlchemy(app)
 
 
+# Gérer les erreurs
+@app.errorhandler(HTTPException)
+def handle_error(err):
+    return render_template("400.html", errorCode=err.code), err.code
+
+
+@app.errorhandler(500)
+@app.errorhandler(501)
+def server_error(err):
+    return render_template("500.html"), err.code
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     error_message = ""
@@ -83,7 +95,7 @@ def index():
                 "confirmation.html",
                 name=name,
                 firstname=firstname,
-                number_guests=number_guests,
+                number_guests=int(number_guests),
                 is_present=is_present,
                 message=message,
             )
@@ -114,18 +126,6 @@ def guests():
     session.close()
 
     return render_template("guests.html", guests=guests, total_guests=total_guests)
-
-
-# Gérer les erreurs
-@app.errorhandler(HTTPException)
-def handle_error(err):
-    return render_template("400.html", errorCode=err.code), err.code
-
-
-@app.errorhandler(500)
-@app.errorhandler(501)
-def server_error(err):
-    return render_template("500.html"), err.code
 
 
 if __name__ == "__main__":

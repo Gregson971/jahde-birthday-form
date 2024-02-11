@@ -12,13 +12,9 @@
         <div class="ml-4">
             <h2 class="text-2xl font-bold mb-3">Merci {{firstname}} pour ta confirmation</h2>
             {% if is_present %}
-            {% if number_guests > 1 %}
-            <p class="mb-4">Vos présences ont bien été confirmée.</p>
+            <p class="mb-4">Votre réponse a bien été enregistrée.</p>
             {% else %}
-            <p class="mb-4">Ta présence a bien été confirmée.</p>
-            {% endif %}
-            {% else %}
-            <p class="mb-4">Ton absence a bien été confirmée.</p>
+            <p class="mb-4">Ton absence a bien été enregistrée. :(</p>
             {% endif %}
         </div>
     </div>
