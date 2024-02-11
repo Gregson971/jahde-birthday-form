@@ -8,8 +8,8 @@ class Guest(Base):
     __tablename__ = "guests"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, index=True, unique=True, nullable=False)
-    firstname = Column(String, index=True, unique=True, nullable=False)
+    name = Column(String, index=True, nullable=False)
+    firstname = Column(String, index=True, nullable=False)
     number_guests = Column(Integer, index=True, nullable=False)
     is_present = Column(Boolean, index=True, nullable=False)
     message = Column(String, index=True)

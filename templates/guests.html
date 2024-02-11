@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold my-6">Liste des invités</h1>
+
+<div class="">
+    {% if guests|length > 0 %}
+    <table class="w-full">
+        <thead>
+            <tr>
+                <th class="border border-gray-300 p-2">Prénom</th>
+                <th class="border border-gray-300 p-2">Nom</th>
+                <th class="border border-gray-300 p-2">Nombre de personnes</th>
+                <th class="border border-gray-300 p-2">Présence</th>
+                <th class="border border-gray-300 p-2">Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for guest in guests %}
+            <tr>
+                <td class="border border-gray-300 p-2">{{guest.firstname}}</td>
+                <td class="border border-gray-300 p-2">{{guest.name}}</td>
+                <td class="border border-gray-300 p-2">{{guest.number_guests}}</td>
+                <td class="border border-gray-300 p-2">
+                    {% if guest.is_present %}
+                    <svg class="w-6 h-6 text-green-500 dark:text-white" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd"
+                            d="M2 12a10 10 0 1 1 20 0 10 10 0 0 1-20 0Zm13.7-1.3a1 1 0 0 0-1.4-1.4L11 12.6l-1.8-1.8a1 1 0 0 0-1.4 1.4l2.5 2.5c.4.4 1 .4 1.4 0l4-4Z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {% else %}
+                    <svg class="w-6 h-6 text-red-500 dark:text-white" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18 18 6m0 12L6 6" />
+                    </svg>
+                    {% endif %}
+                </td>
+                <td class="border border-gray-300 p-2">{{guest.message}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="w-full p-2">
+        <p class="font-bold">Total : {{total_guests}} personnes</p>
+    </div>
+    {% endif %}
+
+    {% if guests|length == 0 %}
+    <p>Aucun invité pour le moment</p>
+    {% endif %}
+</div>
+
+{% endblock %}

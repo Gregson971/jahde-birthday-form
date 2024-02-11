@@ -1,28 +1,23 @@
+from http.client import HTTPException
 import os
 from flask import Flask, render_template, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import dotenv_values
+from dotenv import load_dotenv
 
 from models import Base, Guest
 
 
-env = os.environ.get("ENV")
+# Load the environment variables
+load_dotenv()
 
-if env == "production":
-    db_user = os.environ.get("DB_USER")
-    db_password = os.environ.get("DB_PASSWORD")
-    db_host = os.environ.get("DB_HOST")
-    db_port = os.environ.get("DB_PORT")
-    db_name = os.environ.get("DB_NAME")
-else:
-    config = dotenv_values(".env")
-    db_user = config["DB_USER"]
-    db_password = config["DB_PASSWORD"]
-    db_host = config["DB_HOST"]
-    db_port = config["DB_PORT"]
-    db_name = config["DB_NAME"]
+# Get the environment variable
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+db_host = os.getenv("DB_HOST")
+db_port = os.getenv("DB_PORT")
+db_name = os.getenv("DB_NAME")
 
 db_url = f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 
@@ -34,7 +29,6 @@ db = SQLAlchemy(app)
 
 
 @app.route("/", methods=["GET", "POST"])
-@app.route("/index", methods=["GET", "POST"])
 def index():
     error_message = ""
     if request.method == "POST":
@@ -99,6 +93,41 @@ def index():
         return render_template("index.html")
 
 
+@app.route("/guests")
+def guests():
+    # Create a connection to the database
+    engine = create_engine(db_url)
+
+    Base.metadata.create_all(engine)
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    guests = session.query(Guest).all()
+
+    # Count the number of guests from the column number_guests
+    total_guests = 0
+    for guest in guests:
+        if guest.is_present:
+            total_guests += guest.number_guests
+
+    session.close()
+
+    return render_template("guests.html", guests=guests, total_guests=total_guests)
+
+
+# Gérer les erreurs
+@app.errorhandler(HTTPException)
+def handle_error(err):
+    return render_template("400.html", errorCode=err.code), err.code
+
+
+@app.errorhandler(500)
+@app.errorhandler(501)
+def server_error(err):
+    return render_template("500.html"), err.code
+
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 8000))
+    app.run(host="0.0.0.0", port=port, debug=True)
